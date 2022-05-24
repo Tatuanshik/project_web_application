@@ -58,7 +58,7 @@ def profile(request, username):
         'profile': profile,
     }
     return render(request, template, context)
- 
+
 
 def post_detail(request, post_id):
     template = 'posts/post_detail.html'

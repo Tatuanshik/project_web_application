@@ -63,16 +63,16 @@ class PostViewsTests(TestCase):
             reverse('posts:post_create'): 'posts/create_post.html',
             reverse('posts:post_detail', kwargs={'post_id': self.post.id}):
             'posts/post_detail.html',
-            reverse('posts:add_comment', kwargs= {'post_id': self.post.id}):
+            reverse('posts:add_comment', kwargs={'post_id': self.post.id}):
             'posts/post_detail.html',
         }
 
         for reverse_name, template in templates_page_names.items():
             with self.subTest(reverse_name=reverse_name):
-                response = self.authorized_client.get(reverse_name, follow=True)
+                response = self.authorized_client.get(
+                    reverse_name, follow=True)
                 self.assertTemplateUsed(response, template)
         cache.clear()
-                
 
     def check_correct_context(self, response):
         response_post = response.context.get('page_obj')[0]
@@ -190,7 +190,6 @@ class PaginatorViewsTest(TestCase):
                     len(response.context['page_obj']), NUMBER
                 )
         cache.clear()
-                
 
     def test_second_page_contains_three_records(self):
         templates_page_names = {
@@ -212,6 +211,7 @@ class PaginatorViewsTest(TestCase):
         self.assertEqual(len(response.context.get('page_obj').object_list), 0)
         cache.clear()
 
+
 class CacheTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -229,7 +229,7 @@ class CacheTests(TestCase):
         self.authorized_client.force_login(self.user)
 
     def test_cache_main(self):
-        first_cond= self.authorized_client.get(reverse('posts:main'))
+        first_cond = self.authorized_client.get(reverse('posts:main'))
         post = Post.objects.get(id=1)
         post.text = 'Тут поменяли текст'
         post.save()
@@ -254,7 +254,7 @@ class FollowTests(TestCase):
             author=self.following,
             text='Проверяем ленту новостей'
         )
-        
+
     def test_follow_true(self):
         self.auth_follower.get(reverse('posts:profile_follow',
                                kwargs={'username': self.following.username}))

@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.conf import settings
 from ..models import Group, Post, User, Comment
-from ..forms import PostForm, CommentForm
+from ..forms import PostForm
 
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -135,11 +135,6 @@ class PostFormTests(TestCase):
             'text': self.comment.text,
             'group': self.group.id,
         }
-        response = self.authorized_client.post(
-            reverse('posts:post_detail', kwargs={'post_id': self.post.id}),
-            data=form_data,
-            follow=True
-        )
         new_comment = Comment.objects.latest('text')
         self.assertEqual(form_data['text'], new_comment.text)
         self.assertEqual(Comment.objects.count(), comment_count + 0)
