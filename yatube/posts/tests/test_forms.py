@@ -124,59 +124,6 @@ class PostFormTests(TestCase):
         self.assertEqual(form_data['text'], new_post.text)
         self.assertEqual(Post.objects.count(), posts_count + 0)
 
-    def test_add_comment_from_authorized_client(self):
-        comment_count = Comment.objects.count()
-        form_data = {
-            'text': self.post.text,
-        }
-        response = self.authorized_client.post(
-            reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
-            data=form_data,
-            follow=True
-        )
-        self.assertRedirects(
-            response,
-            reverse(
-                'posts:post_detail', kwargs={'post_id': self.post.id})
-        )
-        self.assertEqual(Comment.objects.count(), comment_count + 1)
-
-    def test_create_post_guest_client(self):
-        posts_count = Post.objects.count()
-        form_data = {
-            'text': self.post.text,
-            'group': self.group.id,
-        }
-        response = self.guest_client.post(
-            reverse('posts:post_create'),
-            data=form_data,
-            follow=True
-        )
-        login = reverse('users:login')
-        create = reverse('posts:post_create')
-        self.assertRedirects(
-            response,
-            f'{login}?next={create}',
-        )
-        self.assertEqual(Post.objects.count(), posts_count + 0)
-
-    def test_edit_post(self):
-        posts_count = Post.objects.count()
-        form_data = {
-            'text': 'Что-то новенькое добавлено',
-        }
-        response = self.authorized_client.post(
-            reverse('posts:post_edit', kwargs={'post_id': self.post.id}),
-            data=form_data,
-            follow=True
-        )
-        new_post = Post.objects.latest('pub_date')
-
-        self.assertRedirects(response, reverse('posts:post_detail', kwargs={
-            'post_id': self.post.id}))
-        self.assertEqual(form_data['text'], new_post.text)
-        self.assertEqual(Post.objects.count(), posts_count + 0)
-
     def test_comment_form_authorized_client(self):
         comment_count = Comment.objects.count()
         form_data = {
