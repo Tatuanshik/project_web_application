@@ -271,6 +271,6 @@ class FollowTests(TestCase):
         self.assertEqual(len(post_list), 0)
         Follow.objects.create(user=nonfollower, author=self.post.author)
         response = self.authorized_client.get(reverse('posts:follow_index'))
-        post_list_2 = response.context.get("page_obj") 
-        single_post_2 = post_list_2[0] 
+        post_list_2 = response.context.get('page_obj')
+        single_post_2 = post_list_2[0]
         self.assertEqual(single_post_2, self.post)
