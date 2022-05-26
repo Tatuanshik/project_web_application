@@ -49,13 +49,11 @@ def profile(request, username):
         ).exists()
     else:
         following = False
-    profile = author
     context = {
         'author': author,
         'posts_count': posts_count,
         'page_obj': page_obj,
         'following': following,
-        'profile': profile,
     }
     return render(request, template, context)
 
@@ -63,13 +61,11 @@ def profile(request, username):
 def post_detail(request, post_id):
     template = 'posts/post_detail.html'
     post = get_object_or_404(Post, id=post_id)
-    comment = CommentForm(request.POST or None)
+    form_comment = CommentForm(request.POST or None)
     comments = post.comments.all()
-    count = Post.objects.filter(id=post_id).count()
     context = {
         'post': post,
-        'count': count,
-        'comment': comment,
+        'form_comment': form_comment,
         'comments': comments,
     }
     return render(request, template, context)
@@ -127,10 +123,12 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
-    user = request.user
-    is_follower = Follow.objects.filter(user=user, author=author)
-    if user != author and not is_follower.exists():
-        Follow.objects.create(user=user, author=author)
+    user = get_object_or_404(User, username=request.user)
+    if author != user:
+        Follow.objects.get_or_create(
+        author=author,
+        user=user,
+    )
     return redirect(reverse('posts:profile', args=[username]))
 
 

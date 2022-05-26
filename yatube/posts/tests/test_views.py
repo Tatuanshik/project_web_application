@@ -65,6 +65,7 @@ class PostViewsTests(TestCase):
             'posts/post_detail.html',
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}):
             'posts/post_detail.html',
+            reverse('posts:follow_index'):'posts/follow.html',
         }
 
         for reverse_name, template in templates_page_names.items():
@@ -72,7 +73,6 @@ class PostViewsTests(TestCase):
                 response = self.authorized_client.get(
                     reverse_name, follow=True)
                 self.assertTemplateUsed(response, template)
-        cache.clear()
 
     def check_correct_context(self, response):
         response_post = response.context.get('page_obj')[0]
@@ -88,19 +88,16 @@ class PostViewsTests(TestCase):
     def test_posts_main_page_show_correct_context(self):
         response = self.authorized_client.get(reverse('posts:main'))
         self.check_correct_context(response)
-        cache.clear()
 
     def test_posts_group_page_show_correct_context(self):
         response = self.authorized_client.get(reverse(
             'posts:group', kwargs={'slug': 'test-slug'}))
         self.check_correct_context(response)
-        cache.clear()
 
     def test_posts_profile_page_show_correct_context(self):
         response = self.authorized_client.get(reverse(
             'posts:profile', kwargs={'username': self.user.username}))
         self.check_correct_context(response)
-        cache.clear()
 
     def test_post_edit_show_correct_context(self):
         response = self.authorized_client.get(reverse(
@@ -113,7 +110,6 @@ class PostViewsTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
-        cache.clear()
 
     def test_post_create_show_correct_context(self):
         response = self.authorized_client.get(reverse(
@@ -126,7 +122,6 @@ class PostViewsTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
-        cache.clear()
 
     def test_post_detail_page_show_correct_context(self):
         response = self.authorized_client.get(reverse(
@@ -134,7 +129,6 @@ class PostViewsTests(TestCase):
         self.assertEqual(response.context['post'].text, self.post.text)
         post_count = response.context['post'].author.posts.count()
         self.assertEqual(self.post.author.posts.count(), post_count)
-        cache.clear()
 
     def test_comment_exist_in_post_detail(self):
         response = self.authorized_client.get(
@@ -144,7 +138,6 @@ class PostViewsTests(TestCase):
         self.assertEqual(
             response.context.get('comments')[0].text,
             self.comment.text)
-        cache.clear()
 
 
 class PaginatorViewsTest(TestCase):
@@ -266,3 +259,12 @@ class FollowTests(TestCase):
         self.auth_follower.get(reverse('posts:profile_unfollow',
                                kwargs={'username': self.following.username}))
         self.assertEqual(Follow.objects.all().count(), 0)
+
+    def test_context_follow_index(self):
+        nonfollower = User.objects.create_user(username='nonfollower')
+        self.authorized_client = Client()
+        self.authorized_client.force_login(nonfollower)
+        response = self.authorized_client.get(reverse('posts:follow_index'))
+        post_list = response.context.get('page_obj')
+        self.assertFalse(post_list)
+        self.assertEqual(len(post_list), 0)

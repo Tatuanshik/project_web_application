@@ -26,6 +26,7 @@ class GroupURLTests(TestCase):
     def test_url_unexicting_page(self):
         response = self.guest_client.get('/unexicting_page/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertTemplateUsed(response, 'core/404.html')
 
     def test_urls_uses_correct_template(self):
         templates_url_names = {
@@ -40,8 +41,14 @@ class GroupURLTests(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_urls_uses_correct_template(self):
-        response = self.authorized_client.get('/create/')
-        self.assertTemplateUsed(response, 'posts/create_post.html')
+        templates_url_names = {
+            'posts/create_post.html': '/create/',
+            'posts/follow.html': '/follow/',
+        }
+        for template, address in templates_url_names.items():
+            with self.subTest(address=address):
+                response = self.authorized_client.get(address)
+                self.assertTemplateUsed(response, template)
 
     def test_url_comments_exists_authorized_client(self):
         templates_url_names = {
