@@ -65,7 +65,7 @@ class PostViewsTests(TestCase):
             'posts/post_detail.html',
             reverse('posts:add_comment', kwargs={'post_id': self.post.id}):
             'posts/post_detail.html',
-            reverse('posts:follow_index'):'posts/follow.html',
+            reverse('posts:follow_index'): 'posts/follow.html',
         }
 
         for reverse_name, template in templates_page_names.items():

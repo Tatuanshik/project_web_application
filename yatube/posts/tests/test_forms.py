@@ -130,7 +130,7 @@ class PostFormTests(TestCase):
             'text': self.post.text,
         }
         response = self.authorized_client.post(
-            reverse('posts:add_comment', kwargs={'post_id':self.post.id}),
+            reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
             data=form_data,
             follow=True
         )
@@ -183,7 +183,7 @@ class PostFormTests(TestCase):
             'text': self.post.text,
         }
         response = self.authorized_client.post(
-            reverse('posts:add_comment', kwargs={'post_id':self.post.id}),
+            reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
             data=form_data,
             follow=True
         )
@@ -197,12 +197,12 @@ class PostFormTests(TestCase):
             'text': self.post.text,
         }
         response = self.guest_client.post(
-            reverse('posts:add_comment', kwargs={'post_id':self.post.id}),
+            reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
             data=form_data,
             follow=True
         )
         login = reverse('users:login')
-        create = reverse('posts:add_comment', kwargs={'post_id':self.post.id})
+        create = reverse('posts:add_comment', kwargs={'post_id': self.post.id})
         self.assertRedirects(
             response,
             f'{login}?next={create}'
